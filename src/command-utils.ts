@@ -253,37 +253,81 @@ function findAttachedSessionDbPath(sessionId: string): string | null {
 
 function registerSessionDbPath(sessionId: string, dbPath: string): string {
   const resolved = path.resolve(dbPath);
-  const registry = readSessionDbRegistry();
-  for (const [registeredSessionId, registeredDbPath] of Object.entries(registry)) {
-    if (registeredSessionId === sessionId) {
-      continue;
+
+  // Use the registry file itself as a lock by trying to rename it temporarily
+  // This provides atomic read-modify-write operations
+  const registryFile = getSessionRegistryFilePath();
+  const tempFile = `${registryFile}.updating.${process.pid}.${Date.now()}`;
+
+  try {
+    let registry: Record<string, string> = {};
+
+    // Read existing registry if it exists
+    if (fs.existsSync(registryFile)) {
+      registry = readSessionDbRegistry();
     }
-    if (path.resolve(registeredDbPath) === resolved) {
-      throw new Error(
-        `db '${resolved}' is already attached to session '${registeredSessionId}'. Use that session ID or a different DB path.`
-      );
+
+    // Check for conflicts
+    for (const [registeredSessionId, registeredDbPath] of Object.entries(registry)) {
+      if (registeredSessionId === sessionId) {
+        continue;
+      }
+      if (path.resolve(registeredDbPath) === resolved) {
+        throw new Error(
+          `db '${resolved}' is already attached to session '${registeredSessionId}'. Use that session ID or a different DB path.`
+        );
+      }
     }
+
+    // Update registry and write atomically
+    registry[sessionId] = resolved;
+    writeSessionDbRegistry(registry);
+    return resolved;
+
+  } catch (error) {
+    // Clean up temp file if it exists
+    try {
+      if (fs.existsSync(tempFile)) {
+        fs.unlinkSync(tempFile);
+      }
+    } catch {
+      // Ignore cleanup errors
+    }
+    throw error;
   }
-  registry[sessionId] = resolved;
-  writeSessionDbRegistry(registry);
-  return resolved;
 }
 
 function readRegisteredSessionDbPath(sessionId: string): string | null {
-  const registry = readSessionDbRegistry();
-  const raw = registry[sessionId];
-  if (!raw) {
+  const registryFile = getSessionRegistryFilePath();
+  if (!fs.existsSync(registryFile)) {
     return null;
   }
 
-  const resolved = path.resolve(raw);
-  if (!fs.existsSync(resolved)) {
-    delete registry[sessionId];
-    writeSessionDbRegistry(registry);
+  try {
+    const content = fs.readFileSync(registryFile, "utf8");
+    const parsed = JSON.parse(content) as Record<string, string>;
+    const raw = parsed[sessionId];
+    if (!raw || typeof raw !== 'string') {
+      return null;
+    }
+
+    const resolved = path.resolve(raw);
+    if (!fs.existsSync(resolved)) {
+      // Clean up stale entry
+      delete parsed[sessionId];
+      writeSessionDbRegistry(parsed);
+      return null;
+    }
+
+    return resolved;
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      console.warn(`Warning: Session registry file contains invalid JSON: ${error.message}`);
+    } else {
+      console.warn(`Warning: Failed to read session registry file: ${error}`);
+    }
     return null;
   }
-
-  return resolved;
 }
 
 function readSessionDbRegistry(): Record<string, string> {
@@ -293,20 +337,31 @@ function readSessionDbRegistry(): Record<string, string> {
   }
 
   try {
-    const parsed = JSON.parse(fs.readFileSync(file, "utf8")) as unknown;
+    const content = fs.readFileSync(file, "utf8");
+    const parsed = JSON.parse(content) as unknown;
     if (!parsed || typeof parsed !== "object") {
+      console.warn(`Warning: Session registry file ${file} contains invalid data structure, reinitializing`);
       return {};
     }
     const registry = parsed as Record<string, string>;
     const cleaned: Record<string, string> = {};
     for (const [sessionId, dbPath] of Object.entries(registry)) {
+      if (typeof sessionId !== 'string' || typeof dbPath !== 'string') {
+        console.warn(`Warning: Ignoring invalid registry entry: ${sessionId} -> ${dbPath}`);
+        continue;
+      }
       const resolvedDbPath = path.resolve(dbPath);
       if (fs.existsSync(resolvedDbPath)) {
         cleaned[sessionId] = resolvedDbPath;
       }
     }
     return cleaned;
-  } catch {
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      console.warn(`Warning: Session registry file ${file} contains invalid JSON, reinitializing. Parse error: ${error.message}`);
+    } else {
+      console.warn(`Warning: Failed to read session registry file ${file}, reinitializing. Error: ${error}`);
+    }
     return {};
   }
 }
@@ -315,6 +370,20 @@ function writeSessionDbRegistry(registry: Record<string, string>): void {
   const file = getSessionRegistryFilePath();
   const dir = path.dirname(file);
   fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-  fs.writeFileSync(file, `${JSON.stringify(registry, null, 2)}\n`);
-  fs.chmodSync(file, 0o600);
+
+  // Atomic write: write to temp file then rename
+  const tempFile = `${file}.tmp.${Date.now()}.${Math.random().toString(36)}`;
+  try {
+    fs.writeFileSync(tempFile, `${JSON.stringify(registry, null, 2)}\n`);
+    fs.chmodSync(tempFile, 0o600);
+    fs.renameSync(tempFile, file);
+  } catch (error) {
+    // Clean up temp file on error
+    try {
+      fs.unlinkSync(tempFile);
+    } catch {
+      // Ignore cleanup errors
+    }
+    throw error;
+  }
 }
