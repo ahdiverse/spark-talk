@@ -1,0 +1,9 @@
+node_modules/
+dist/
+release/
+.spark-talk-state/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.log
+.DS_Store

@@ -1,0 +1,47 @@
+{
+  "name": "talk-broker",
+  "version": "1.0.0",
+  "description": "SQLite-backed local broker CLI for relaying messages between Codex threads",
+  "license": "Apache-2.0",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "purpose.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "CODE_OF_CONDUCT.md",
+    "docs"
+  ],
+  "bin": {
+    "spark": "dist/cli.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/cli.ts",
+    "dogfood:phase3": "npm run build && node scripts/dogfood/run-phase3.mjs --turns 60",
+    "release:build": "node scripts/release/build-release.mjs",
+    "release:formula": "node scripts/release/generate-formula.mjs",
+    "release:validate:brew": "bash scripts/release/validate-local-homebrew.sh",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1",
+    "commander": "^14.0.1",
+    "pino": "^10.0.0",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^24.3.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,41 @@
+name: release-artifact
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build release tarball
+        run: npm run release:build
+
+      - name: Generate formula for release URL
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          npm run release:formula -- --tag "${GITHUB_REF_NAME}" --output "release/spark-talk.rb"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: spark-talk-release-${{ github.ref_name }}
+          path: |
+            release/*.tgz
+            release/manifest.json
+            release/spark-talk.rb

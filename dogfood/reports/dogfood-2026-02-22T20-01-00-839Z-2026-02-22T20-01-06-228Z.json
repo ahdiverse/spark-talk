@@ -1,0 +1,36 @@
+{
+  "phase": 3,
+  "session": "dogfood-2026-02-22T20-01-00-839Z",
+  "dbPath": "/var/folders/48/h86hk5z16qzgx03dhs3xnzn40000gn/T/talk-broker-dogfood/dogfood-2026-02-22T20-01-00-839Z.db",
+  "generatedAt": "2026-02-22T20:01:06.228Z",
+  "targetTurns": 60,
+  "observedDeliveredTurns": 60,
+  "metrics": {
+    "droppedCount": 0,
+    "duplicateCount": 0,
+    "droppedRate": 0,
+    "duplicateRate": 0,
+    "medianDeliveryLatencyMs": 71,
+    "p95DeliveryLatencyMs": 138
+  },
+  "missingSeqs": [],
+  "duplicatedSeqs": [],
+  "duplicateTurnIds": [],
+  "uxFriction": [
+    {
+      "issue": "Repeated --session and --db flags across commands.",
+      "action": "Added TALK_SESSION/TALK_DB environment defaults and -s/-d aliases.",
+      "status": "resolved"
+    },
+    {
+      "issue": "Long send command for multiline prompts.",
+      "action": "Added spark talk send --stdin to accept piped content.",
+      "status": "resolved"
+    },
+    {
+      "issue": "Watch JSON mode required a long flag.",
+      "action": "Added -j alias for --json.",
+      "status": "resolved"
+    }
+  ]
+}
