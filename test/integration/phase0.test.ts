@@ -584,6 +584,80 @@ describe("phase0 broker", () => {
       }
     );
   });
+
+  it("forces a db path to belong to only one session id", () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "spark-talk-db-attach-"));
+    tempDirs.push(tempDir);
+    const sharedDbPath = path.join(tempDir, "shared.db");
+    const sessionA = `db-owner-a-${Date.now().toString(36)}`;
+    const sessionB = `db-owner-b-${Date.now().toString(36)}`;
+
+    execFileSync(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "src/cli.ts",
+        "talk",
+        "open",
+        sessionA,
+        "--db",
+        sharedDbPath
+      ],
+      {
+        cwd: path.resolve(testDir, "../.."),
+        encoding: "utf8"
+      }
+    );
+
+    let stderr = "";
+    try {
+      execFileSync(
+        process.execPath,
+        [
+          "--import",
+          "tsx",
+          "src/cli.ts",
+          "talk",
+          "open",
+          sessionB,
+          "--db",
+          sharedDbPath
+        ],
+        {
+          cwd: path.resolve(testDir, "../.."),
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"]
+        }
+      );
+      throw new Error("expected opening second session on same db to fail");
+    } catch (error) {
+      const execError = error as { stderr?: string | Buffer };
+      stderr = Buffer.isBuffer(execError.stderr)
+        ? execError.stderr.toString("utf8")
+        : (execError.stderr ?? "");
+    }
+
+    expect(stderr).toContain("already attached to session");
+
+    execFileSync(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "src/cli.ts",
+        "talk",
+        "close",
+        sessionA,
+        "--db",
+        sharedDbPath
+      ],
+      {
+        cwd: path.resolve(testDir, "../.."),
+        encoding: "utf8"
+      }
+    );
+  });
 });
 
 function createTempDb() {

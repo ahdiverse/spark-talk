@@ -254,6 +254,16 @@ function findAttachedSessionDbPath(sessionId: string): string | null {
 function registerSessionDbPath(sessionId: string, dbPath: string): string {
   const resolved = path.resolve(dbPath);
   const registry = readSessionDbRegistry();
+  for (const [registeredSessionId, registeredDbPath] of Object.entries(registry)) {
+    if (registeredSessionId === sessionId) {
+      continue;
+    }
+    if (path.resolve(registeredDbPath) === resolved) {
+      throw new Error(
+        `db '${resolved}' is already attached to session '${registeredSessionId}'. Use that session ID or a different DB path.`
+      );
+    }
+  }
   registry[sessionId] = resolved;
   writeSessionDbRegistry(registry);
   return resolved;
@@ -287,7 +297,15 @@ function readSessionDbRegistry(): Record<string, string> {
     if (!parsed || typeof parsed !== "object") {
       return {};
     }
-    return parsed as Record<string, string>;
+    const registry = parsed as Record<string, string>;
+    const cleaned: Record<string, string> = {};
+    for (const [sessionId, dbPath] of Object.entries(registry)) {
+      const resolvedDbPath = path.resolve(dbPath);
+      if (fs.existsSync(resolvedDbPath)) {
+        cleaned[sessionId] = resolvedDbPath;
+      }
+    }
+    return cleaned;
   } catch {
     return {};
   }
