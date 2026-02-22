@@ -4,14 +4,27 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to publish release assets for (for example: v1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
 
 jobs:
   package:
     runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -29,12 +42,22 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          npm run release:formula -- --tag "${GITHUB_REF_NAME}" --output "release/spark-talk.rb"
+          npm run release:formula -- --tag "${RELEASE_TAG}" --output "release/spark-talk.rb"
+
+      - name: Publish GitHub release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: |
+            release/*.tgz
+            release/manifest.json
+            release/spark-talk.rb
+          generate_release_notes: true
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: spark-talk-release-${{ github.ref_name }}
+          name: spark-talk-release-${{ env.RELEASE_TAG }}
           path: |
             release/*.tgz
             release/manifest.json

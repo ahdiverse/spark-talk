@@ -1,6 +1,6 @@
 {
   "name": "spark-talk",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "SQLite-backed local broker CLI for relaying messages between Spark Talk threads",
   "license": "Apache-2.0",
   "type": "module",
@@ -39,9 +39,9 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^24.3.1",
+    "@types/node": "^25.3.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
+    "vitest": "^4.0.18"
   }
 }

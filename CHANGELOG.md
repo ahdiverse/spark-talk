@@ -2,15 +2,6 @@
 
 All notable changes to this project are documented in this file.
 
-## [1.0.1] - 2026-02-22
-
-### Changed
-
-- Standardized project branding to Spark Talk in package metadata and docs.
-- Updated release documentation and checklist references for `v1.0.1`.
-- Updated security and conduct contacts to `sparktalk@ahdiverse.com`.
-- Hardened Homebrew CI workflow by disabling auto-update and cleanup noise.
-
 ## [1.0.0] - 2026-02-22
 
 ### Added
@@ -23,6 +14,12 @@ All notable changes to this project are documented in this file.
 - Phase 3 dogfood harness and reporting artifacts.
 - Public protocol and versioning policy in `docs/PROTOCOL_VERSIONING.md`.
 - Public install documentation and launch announcement docs.
+
+### Changed
+
+- Standardized project branding to Spark Talk in package metadata and docs.
+- Updated security and conduct contacts to `sparktalk@ahdiverse.com`.
+- Hardened Homebrew CI workflow by disabling auto-update and cleanup noise.
 
 ### Notes
 

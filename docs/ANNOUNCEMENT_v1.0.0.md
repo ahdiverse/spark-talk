@@ -1,6 +1,6 @@
-# Spark Talk v1.0.1 Announcement
+# Spark Talk v1.0.0 Announcement
 
-Spark Talk v1.0.1 is now publicly available as the open-source core for local two-agent chat brokering.
+Spark Talk v1.0.0 is now publicly available as the open-source core for local two-agent chat brokering.
 
 ## What Is Included
 

@@ -73,7 +73,7 @@ npm run release:build
 Generate Homebrew formula for a GitHub release:
 
 ```bash
-npm run release:formula -- --repo ahdiverse/spark-talk --tag v1.0.1 --output homebrew/Formula/spark-talk.rb
+npm run release:formula -- --repo ahdiverse/spark-talk --tag v1.0.0 --output homebrew/Formula/spark-talk.rb
 ```
 
 Validate local Homebrew install from generated tarball:
@@ -82,10 +82,12 @@ Validate local Homebrew install from generated tarball:
 npm run release:validate:brew
 ```
 
+Release assets are published by `.github/workflows/release-artifact.yml` on tag pushes (or manual workflow dispatch for an existing tag).
+
 ## Public Core Launch (Phase 4)
 
 - Launch checklist: `docs/PUBLIC_CORE_LAUNCH_CHECKLIST.md`
-- Announcement template: `docs/ANNOUNCEMENT_v1.0.1.md`
+- Announcement template: `docs/ANNOUNCEMENT_v1.0.0.md`
 - Security policy: `SECURITY.md`
 - Contributing guide: `CONTRIBUTING.md`
 - Code of conduct: `CODE_OF_CONDUCT.md`

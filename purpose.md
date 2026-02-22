@@ -1,4 +1,4 @@
-# Talk Broker v1 Plan (Local SQLite, Homebrew-First, Public Core)
+# Spark Talk v1 Plan (Local SQLite, Homebrew-First, Public Core)
 
 ## Summary
 Build a small Node.js CLI broker exposed as `spark talk` that relays messages between two Codex app threads through a shared SQLite queue, with durable turn logging and watcher UX.
@@ -101,13 +101,13 @@ interface MessageEnvelope {
    1. Single writer model via one broker process per session.
    2. SQLite WAL enabled.
 8. Security defaults:
-   1. DB path default `~/.talk-broker/<sessionId>.db`.
+   1. DB path default `~/.spark-talk/<sessionId>.db`.
    2. Create directory/file with user-only permissions.
 
 ## Homebrew-First Installation Plan
-1. Publish tap: `org/homebrew-talk`.
+1. Publish tap: `ahdiverse/homebrew-spark-talk`.
 2. Install flow:
-   1. `brew tap org/talk`
+   1. `brew tap ahdiverse/spark-talk`
    2. `brew install spark-talk`
 3. Formula strategy:
    1. `depends_on "node@22"`.
