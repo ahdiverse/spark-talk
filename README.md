@@ -62,28 +62,6 @@ spark talk close <sessionId>
 - Protocol policy: `docs/PROTOCOL_VERSIONING.md`
 - Changelog: `CHANGELOG.md`
 
-## Packaging
-
-Build a release tarball and manifest:
-
-```bash
-npm run release:build
-```
-
-Generate Homebrew formula for a GitHub release:
-
-```bash
-npm run release:formula -- --repo ahdiverse/spark-talk --tag v1.0.0 --output homebrew/Formula/spark-talk.rb
-```
-
-Validate local Homebrew install from generated tarball:
-
-```bash
-npm run release:validate:brew
-```
-
-Release assets are published by `.github/workflows/release-artifact.yml` on tag pushes (or manual workflow dispatch for an existing tag).
-
 ## Public Core Launch (Phase 4)
 
 - Launch checklist: `docs/PUBLIC_CORE_LAUNCH_CHECKLIST.md`
