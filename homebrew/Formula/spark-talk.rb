@@ -1,8 +1,8 @@
 class SparkTalk < Formula
   desc "SQLite-backed local broker CLI for relaying messages between Spark Talk threads"
   homepage "https://github.com/ahdiverse/spark-talk"
-  url "https://github.com/ahdiverse/spark-talk/releases/download/v1.0.0/spark-talk-1.0.0.tgz"
-  sha256 "354dff51bfedfe1781ed7165139a8aa9425bed0e0ca8047e54bc3755232bc733"
+  url "https://github.com/ahdiverse/spark-talk/releases/download/v1.0.1/spark-talk-1.0.1.tgz"
+  sha256 "13a9b44ca15e9c262311a7509f9b64aec040510b7d7cf7cdf9b11d1c920864b7"
   license "Apache-2.0"
 
   depends_on "node@22"
@@ -21,6 +21,6 @@ class SparkTalk < Formula
   end
 
   test do
-    assert_match "1.0.0", shell_output("#{bin}/spark --version").strip
+    assert_match "1.0.1", shell_output("#{bin}/spark --version").strip
   end
 end

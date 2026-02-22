@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFileSync, spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
   ackTurn,
   deliverQueuedTurns,
@@ -19,6 +19,17 @@ import { sendInputSchema } from "../../src/types.js";
 
 const tempDirs: string[] = [];
 const testDir = path.dirname(fileURLToPath(import.meta.url));
+let registryHomeDir = "";
+
+beforeAll(() => {
+  registryHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), "spark-talk-registry-"));
+  process.env.SPARK_TALK_REGISTRY_HOME = registryHomeDir;
+  tempDirs.push(registryHomeDir);
+});
+
+afterAll(() => {
+  delete process.env.SPARK_TALK_REGISTRY_HOME;
+});
 
 afterEach(() => {
   while (tempDirs.length > 0) {
@@ -509,6 +520,143 @@ describe("phase0 broker", () => {
 
     expect(joinOut).toContain(`session=${sessionId}`);
     expect(joinOut).toContain("joined_agent=charlie");
+  });
+
+  it("forces a session id to use a single attached db path", () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "spark-talk-attach-"));
+    tempDirs.push(tempDir);
+    const dbPathA = path.join(tempDir, "a.db");
+    const dbPathB = path.join(tempDir, "b.db");
+    const sessionId = `attach-${Date.now().toString(36)}`;
+
+    execFileSync(
+      process.execPath,
+      ["--import", "tsx", "src/cli.ts", "talk", "open", sessionId, "--db", dbPathA],
+      {
+        cwd: path.resolve(testDir, "../.."),
+        encoding: "utf8"
+      }
+    );
+
+    let stderr = "";
+    try {
+      execFileSync(
+        process.execPath,
+        [
+          "--import",
+          "tsx",
+          "src/cli.ts",
+          "talk",
+          "send",
+          "--session",
+          sessionId,
+          "--db",
+          dbPathB,
+          "--from",
+          "agent-a",
+          "--to",
+          "agent-b",
+          "--no-ensure-broker",
+          "should fail"
+        ],
+        {
+          cwd: path.resolve(testDir, "../.."),
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"]
+        }
+      );
+      throw new Error("expected send with mismatched --db to fail");
+    } catch (error) {
+      const execError = error as { stderr?: string | Buffer };
+      stderr = Buffer.isBuffer(execError.stderr)
+        ? execError.stderr.toString("utf8")
+        : (execError.stderr ?? "");
+    }
+
+    expect(stderr).toContain("already attached");
+
+    execFileSync(
+      process.execPath,
+      ["--import", "tsx", "src/cli.ts", "talk", "close", sessionId, "--db", dbPathA],
+      {
+        cwd: path.resolve(testDir, "../.."),
+        encoding: "utf8"
+      }
+    );
+  });
+
+  it("forces a db path to belong to only one session id", () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "spark-talk-db-attach-"));
+    tempDirs.push(tempDir);
+    const sharedDbPath = path.join(tempDir, "shared.db");
+    const sessionA = `db-owner-a-${Date.now().toString(36)}`;
+    const sessionB = `db-owner-b-${Date.now().toString(36)}`;
+
+    execFileSync(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "src/cli.ts",
+        "talk",
+        "open",
+        sessionA,
+        "--db",
+        sharedDbPath
+      ],
+      {
+        cwd: path.resolve(testDir, "../.."),
+        encoding: "utf8"
+      }
+    );
+
+    let stderr = "";
+    try {
+      execFileSync(
+        process.execPath,
+        [
+          "--import",
+          "tsx",
+          "src/cli.ts",
+          "talk",
+          "open",
+          sessionB,
+          "--db",
+          sharedDbPath
+        ],
+        {
+          cwd: path.resolve(testDir, "../.."),
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"]
+        }
+      );
+      throw new Error("expected opening second session on same db to fail");
+    } catch (error) {
+      const execError = error as { stderr?: string | Buffer };
+      stderr = Buffer.isBuffer(execError.stderr)
+        ? execError.stderr.toString("utf8")
+        : (execError.stderr ?? "");
+    }
+
+    expect(stderr).toContain("already attached to session");
+
+    execFileSync(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "src/cli.ts",
+        "talk",
+        "close",
+        sessionA,
+        "--db",
+        sharedDbPath
+      ],
+      {
+        cwd: path.resolve(testDir, "../.."),
+        encoding: "utf8"
+      }
+    );
   });
 });
 
