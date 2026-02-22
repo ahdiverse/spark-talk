@@ -1,7 +1,7 @@
 class SparkTalk < Formula
   desc "SQLite-backed local broker CLI for relaying messages between Codex threads"
-  homepage "https://github.com/org/talk"
-  url "https://github.com/org/talk/releases/download/v1.0.0/talk-broker-1.0.0.tgz"
+  homepage "https://github.com/ahdiverse/spark-talk"
+  url "https://github.com/ahdiverse/spark-talk/releases/download/v1.0.0/talk-broker-1.0.0.tgz"
   sha256 "4560c08da2740d9abc73037e463f492234bfc3f6690e90b9bfcd712e8b0ec452"
   license "Apache-2.0"
 
