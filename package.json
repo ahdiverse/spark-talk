@@ -1,7 +1,7 @@
 {
-  "name": "talk-broker",
-  "version": "1.0.0",
-  "description": "SQLite-backed local broker CLI for relaying messages between Codex threads",
+  "name": "spark-talk",
+  "version": "1.0.1",
+  "description": "SQLite-backed local broker CLI for relaying messages between Spark Talk threads",
   "license": "Apache-2.0",
   "type": "module",
   "files": [

@@ -35,6 +35,10 @@ jobs:
           npm run release:formula -- --local-tarball "$TARBALL_PATH" --output "homebrew/Formula/spark-talk.rb"
 
       - name: Install formula
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+          HOMEBREW_NO_INSTALL_CLEANUP: "1"
+          HOMEBREW_NO_ENV_HINTS: "1"
         run: |
           TAP_NAME="local/spark-test"
           brew untap "$TAP_NAME" || true
@@ -50,6 +54,10 @@ jobs:
 
       - name: Cleanup
         if: always()
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+          HOMEBREW_NO_INSTALL_CLEANUP: "1"
+          HOMEBREW_NO_ENV_HINTS: "1"
         run: |
           brew uninstall --formula spark-talk || true
           brew untap local/spark-test || true

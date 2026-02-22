@@ -4,7 +4,7 @@
 
 Please do not open public issues for security vulnerabilities.
 
-Report privately to: security@talkbroker.dev
+Report privately to: sparktalk@ahdiverse.com
 
 Include:
 

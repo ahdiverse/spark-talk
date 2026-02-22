@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-export const DEFAULT_DB_DIR = path.join(os.homedir(), ".talk-broker");
+export const DEFAULT_DB_DIR = path.join(os.homedir(), ".spark-talk");
 
 export function getDefaultDbPath(sessionId: string): string {
   const safeSessionId = sessionId.replace(/[^a-zA-Z0-9._-]/g, "_");

@@ -5,7 +5,7 @@
 Official distribution model is Homebrew-first.
 
 ```bash
-brew tap org/talk
+brew tap ahdiverse/spark-talk
 brew install spark-talk
 spark talk --help
 ```
@@ -13,7 +13,7 @@ spark talk --help
 ## npm (Secondary)
 
 ```bash
-npm install -g talk-broker
+npm install -g spark-talk
 spark talk --help
 ```
 

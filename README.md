@@ -1,4 +1,4 @@
-# Talk Broker
+# Spark Talk
 
 Local SQLite-backed CLI broker for relaying messages between two Codex app threads.
 
@@ -12,7 +12,7 @@ Local SQLite-backed CLI broker for relaying messages between two Codex app threa
 Primary install path (Homebrew):
 
 ```bash
-brew tap org/talk
+brew tap ahdiverse/spark-talk
 brew install spark-talk
 spark talk --help
 ```
@@ -20,7 +20,7 @@ spark talk --help
 Secondary install path (npm):
 
 ```bash
-npm install -g talk-broker
+npm install -g spark-talk
 spark talk --help
 ```
 
@@ -73,7 +73,7 @@ npm run release:build
 Generate Homebrew formula for a GitHub release:
 
 ```bash
-npm run release:formula -- --repo org/talk --tag v1.0.0 --output homebrew/Formula/spark-talk.rb
+npm run release:formula -- --repo ahdiverse/spark-talk --tag v1.0.1 --output homebrew/Formula/spark-talk.rb
 ```
 
 Validate local Homebrew install from generated tarball:
@@ -85,7 +85,7 @@ npm run release:validate:brew
 ## Public Core Launch (Phase 4)
 
 - Launch checklist: `docs/PUBLIC_CORE_LAUNCH_CHECKLIST.md`
-- Announcement template: `docs/ANNOUNCEMENT_v1.0.0.md`
+- Announcement template: `docs/ANNOUNCEMENT_v1.0.1.md`
 - Security policy: `SECURITY.md`
 - Contributing guide: `CONTRIBUTING.md`
 - Code of conduct: `CODE_OF_CONDUCT.md`

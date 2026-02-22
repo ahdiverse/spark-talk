@@ -10,4 +10,4 @@ Participants are expected to:
 
 Maintainers may remove or edit content and ban contributors for violations.
 
-For conduct issues, contact: conduct@talkbroker.dev
+For conduct issues, contact: sparktalk@ahdiverse.com

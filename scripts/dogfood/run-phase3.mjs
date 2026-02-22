@@ -12,7 +12,7 @@ const args = parseArgs(process.argv.slice(2));
 const turns = Number.parseInt(args.turns ?? "60", 10);
 const session = args.session ?? `dogfood-${new Date().toISOString().replace(/[:.]/g, "-")}`;
 
-const defaultDb = path.join(os.tmpdir(), "talk-broker-dogfood", `${session}.db`);
+const defaultDb = path.join(os.tmpdir(), "spark-talk-dogfood", `${session}.db`);
 const dbPath = path.resolve(args.db ?? defaultDb);
 const reportDir = path.resolve(args.reportDir ?? path.join(repoRoot, "dogfood", "reports"));
 

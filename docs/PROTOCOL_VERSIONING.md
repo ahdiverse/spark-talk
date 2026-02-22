@@ -5,7 +5,7 @@ This document defines how `spark talk` protocol compatibility is managed for pub
 ## Current Version
 
 - Protocol: `1.0`
-- First stable release: `v1.0.0`
+- Current stable release: `v1.0.1`
 
 ## Compatibility Rules
 
