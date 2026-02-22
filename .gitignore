@@ -1,6 +1,6 @@
 node_modules/
 dist/
-release/
+/release/
 .spark-talk-state/
 *.sqlite
 *.sqlite-wal
